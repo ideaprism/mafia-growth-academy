@@ -4,7 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { LogOut, Plus, Target, TrendingUp, Users, Crown, Settings, Eye, Camera, Link, Edit, Trash2, Gamepad2, UtensilsCrossed, PenTool, Dumbbell, Briefcase, HelpCircle } from 'lucide-react';
+import { 
+  LogOut, Plus, Target, TrendingUp, Users, Crown, Settings, Eye, Camera, Link, Edit, Trash2, 
+  Gamepad2, UtensilsCrossed, PenTool, Dumbbell, Briefcase, HelpCircle, Menu, X 
+} from 'lucide-react';
 import { User, ChallengeCategory, CategoryConfig } from '@/types';
 import { UserRadarChart } from './RadarChart';
 import { ChallengeForm } from './ChallengeForm';
@@ -32,6 +35,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
   const [showCertificationModal, setShowCertificationModal] = useState(false);
   const [showUserGuide, setShowUserGuide] = useState(false);
   const { toast } = useToast();
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   const categories = getAllCategories();
   const userProgress = useMemo(() => calculateUserProgressPercentage(user.id), [user.id]);
@@ -173,13 +177,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
                 className="w-8 h-8 object-contain"
               />
               <div>
-                <h1 className="text-2xl font-bold text-foreground">{user.name}</h1>
-                <p className="text-sm text-muted-foreground">
+                <h1 className="text-xl md:text-2xl font-bold text-foreground">{user.name}</h1>
+                <p className="text-xs md:text-sm text-muted-foreground">
                   {user.family}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center gap-2">
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -212,7 +218,57 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
                 로그아웃
               </Button>
             </div>
+
+            {/* Mobile Menu Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="md:hidden"
+            >
+              {showMobileMenu ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </Button>
           </div>
+
+          {/* Mobile Menu Dropdown */}
+          {showMobileMenu && (
+            <div className="md:hidden mt-4 p-4 bg-background border border-border rounded-lg shadow-lg">
+              <div className="flex flex-col gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setShowUserGuide(true)}
+                  className="text-mafia-gold hover:text-yellow-400 hover:bg-yellow-500/10"
+                >
+                  <HelpCircle className="w-4 h-4 mr-2" />
+                  이용안내
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    removeSampleData();
+                    toast({
+                      title: '임시 데이터 초기화 완료',
+                      description: '샘플 데이터가 모두 삭제되었습니다.',
+                    });
+                    window.location.reload();
+                  }}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  임시 데이터 초기화
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => window.location.href = '/boss'}>
+                  <Crown className="w-4 h-4 mr-2" />
+                  두목 페이지
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleLogout}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  로그아웃
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
